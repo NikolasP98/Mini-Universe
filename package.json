@@ -10,7 +10,5 @@
   "devDependencies": {
     "vite": "^2.9.9"
   },
-  "dependencies": {
-    "pixi.js": "^6.4.2"
-  }
+  "dependencies": {}
 }

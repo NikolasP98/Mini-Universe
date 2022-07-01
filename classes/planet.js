@@ -1,54 +1,38 @@
-import * as PIXI from 'pixi.js';
+import { ctx } from '../main';
+import Vector from './vector';
+import { ellipse } from './shapes';
+export default class Planet {
+	constructor({ x = 0, y = 0, radius = 20, distance = 30 }) {
+		this.position = new Vector(x, y);
+		this.speed = new Vector();
 
-export default class Planet extends PIXI.Sprite {
-	constructor({
-		x = 100,
-		y = 100,
-		radius = 20,
-		speed = 0,
-		texture,
-		distance = 0,
-	}) {
-		super(texture);
-		this.anchor.set(0.5);
 		this.radius = radius;
-		this.width = this.radius * 2;
-		this.height = this.radius * 2;
+
 		this.theta = 0;
+
+		this.color = 'white';
 
 		this.moons = [];
 
-		this.x = x;
-		this.y = y;
-		this.center = new PIXI.Point(this.x, this.y);
-
-		this.speed = speed;
-
-		this.distance = distance * (Math.random() * 300 + 100);
-
-		// this.alpha = 0.9;
+		// this.distance = distance * (Math.random() * 300 + 100);
+		this.distance = distance + Math.random() * 30;
 	}
 
-	spawnMoon({ app, amt = 1, level = 1 }) {
+	spawnMoon({ amt = 1, level = 1 }) {
 		for (let i = 0; i < amt; i++) {
-			// Load Texture
-			const moonTexture = app.loader.resources['planet02'].texture;
-
 			// Generate coordinates
 			const rVar = this.radius / 2;
 			const sVar = Math.random() / 2;
 
 			const moon = new Planet({
-				x: this.x + this.distance,
-				y: this.y,
+				x: this.position.x + this.distance,
+				y: this.position.y,
 				radius: rVar,
-				speed: sVar,
-				texture: moonTexture,
 				distance: 1 / level,
 			});
 			this.moons.push(moon);
 			if (level < 2) {
-				moon.spawnMoon({ app, amt: 1, level: level + 1 });
+				moon.spawnMoon({ amt: 1, level: level + 1 });
 			}
 		}
 	}
@@ -58,11 +42,9 @@ export default class Planet extends PIXI.Sprite {
 			this.theta += this.speed;
 			const piRatio = Math.PI / 180;
 
-			// ! MOONS ARE ORBITTING AROUND A FIXED POINT
-
-			this.x =
+			this.position.x =
 				Math.cos(this.theta * piRatio) * this.distance + this.center.x;
-			this.y =
+			this.position.y =
 				Math.sin(this.theta * piRatio) * this.distance + this.center.y;
 		}
 
@@ -73,20 +55,21 @@ export default class Planet extends PIXI.Sprite {
 		}
 	}
 
-	update(app) {
-		this.orbit();
-		this.draw(app);
-	}
+	draw() {
+		ctx.fillStyle = this.color;
+		ctx.strokeStyle = 'rgba(0,0,0)';
 
-	draw(app) {
-		// Draw the planet
-		app.stage.addChild(this);
-
-		// Draw the moons, if any exist, recursively
 		if (this.moons.length > 0) {
 			this.moons.forEach((moon) => {
-				moon.draw(app);
+				moon.draw();
 			});
 		}
+
+		ellipse(this.position.x, this.position.y, this.radius);
+	}
+
+	update() {
+		// this.orbit();
+		this.draw();
 	}
 }
