@@ -13,19 +13,28 @@ const mouse = {
 
 const generatePlanet = () => {
 	planet = new Planet({
-		radius: 10,
+		radius: 20,
 	});
 
-	planet.spawnMoon({ amt: 1 });
+	planet.spawnMoon({ amt: 3 });
 };
 
 const setup = () => {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
 	ctx.translate(canvas.width / 2, canvas.height / 2);
 	generatePlanet();
 	window.requestAnimationFrame(animate);
 };
 
 const animate = () => {
+	ctx.clearRect(
+		-canvas.width,
+		-canvas.height,
+		canvas.width * 2,
+		canvas.height * 2
+	);
+
 	planet.update();
 	window.requestAnimationFrame(animate);
 };
